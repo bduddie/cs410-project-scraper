@@ -1,6 +1,6 @@
-Android forum scraper for CS410 final project
+### Android forum scraper for CS410 final project
 
-Dependencies:
+#### Dependencies:
 
-Python 2.7
-Scrapy
+* Python 2.7
+* Scrapy (http://scrapy.org)
