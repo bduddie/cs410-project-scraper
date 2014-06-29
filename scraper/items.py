@@ -4,14 +4,12 @@
 #
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
-
 import scrapy
 
 
-class ForumThread(scrapy.Item):
-    topic = scrapy.Item()
-    op = scrapy.Item()
-
-class ForumPost(scrapy.Item):
-    author = scrapy.Item()
-    content = scrapy.Item()
+class ThreadItem(scrapy.Item):
+    title = scrapy.Field()
+    link = scrapy.Field()
+    thread_id = scrapy.Field()
+    forum = scrapy.Field()
+    sub_forum = scrapy.Field()

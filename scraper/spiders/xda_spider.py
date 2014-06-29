@@ -1,4 +1,6 @@
 import scrapy
+from scraper.items import ThreadItem
+
 
 class XdaSpider(scrapy.Spider):
     name = "xda"
@@ -8,7 +10,14 @@ class XdaSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        uri_split = response.url.split("/")
-        filename = uri_split[-1]
-        with open(filename, 'wb') as file:
-            file.write(response.body)
+        urlsplit = response.url.split('/')
+        forum = urlsplit[-2]
+        sub_forum = urlsplit[-1]
+        for sel in response.xpath('//a[@class="threadTitle"]'):
+            ti = ThreadItem()
+            ti['title'] = sel.xpath('text()').extract()
+            ti['link'] = sel.xpath('@href').extract()
+            ti['thread_id'] = sel.xpath('@href').re('.\-t([0-9]+)')
+            ti['forum'] = forum
+            ti['sub_forum'] = sub_forum
+            yield ti
