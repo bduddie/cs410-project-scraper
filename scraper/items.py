@@ -13,3 +13,12 @@ class ThreadItem(scrapy.Item):
     thread_id = scrapy.Field()
     forum = scrapy.Field()
     sub_forum = scrapy.Field()
+
+
+class PostItem(scrapy.Item):
+    author = scrapy.Field()
+    post_id = scrapy.Field()
+    thread_id = scrapy.Field()
+    content = scrapy.Field()
+    thanks = scrapy.Field()
+    date = scrapy.Field()
