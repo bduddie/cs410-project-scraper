@@ -30,6 +30,7 @@ class XdaSpider(scrapy.Spider):
             item['forum'] = forum
             item['sub_forum'] = sub_forum
             item['view_count'] = sel.xpath('../../../td[@class="statsColumn"]/div/text()').re('Views: ([0-9,]+)')[0]
+            item['view_count'] = item['view_count'].replace(',', '')
             yield item
             yield scrapy.Request(urljoin(response.url, item['link']), callback=self.parse_thread)
 
