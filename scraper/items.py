@@ -8,7 +8,10 @@
 import scrapy
 
 
-class ScraperItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class ForumThread(scrapy.Item):
+    topic = scrapy.Item()
+    op = scrapy.Item()
+
+class ForumPost(scrapy.Item):
+    author = scrapy.Item()
+    content = scrapy.Item()
