@@ -68,7 +68,7 @@ class XdaSpider(scrapy.Spider):
             ad = post_message.xpath('./div[@style="margin: 0 0 15px 15px; float: right"]')
             if ad:
                 item['content'] = item['content'].replace(ad.extract()[0], '')
-            item['content'] = item['content'].replace('\r', '').replace('\n', '').replace('\t', '')
+            item['content'] = re.sub('[\r\t\n]', '', item['content'])
 
             item['thanks'] = []
             for ty in response.xpath('//tr[@id="collapseobj_Thanks_' + item['post_id'] + '"]//a/text()'):
