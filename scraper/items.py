@@ -13,6 +13,7 @@ class ThreadItem(scrapy.Item):
     thread_id = scrapy.Field()
     forum = scrapy.Field()
     sub_forum = scrapy.Field()
+    view_count = scrapy.Field()
 
 
 class PostItem(scrapy.Item):

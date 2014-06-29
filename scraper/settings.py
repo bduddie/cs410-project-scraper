@@ -15,7 +15,7 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 
 DOWNLOAD_DELAY = 1.5
 
-LOG_FILE = 'scraper.log'
+#LOG_FILE = 'scraper.log'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scraper (+http://www.yourdomain.com)'
