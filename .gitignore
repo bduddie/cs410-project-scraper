@@ -1,4 +1,4 @@
 *.pyc
 .idea
-scraper.log
+*.log
 *.json
