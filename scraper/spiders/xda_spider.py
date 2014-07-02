@@ -63,7 +63,17 @@ class XdaSpider(scrapy.Spider):
 
             item = PostItem()
             item['thread_id'] = thread_id
-            item['author'] = sel.xpath('..//a[@class="posterName"]//text()')[0].extract()
+            author_xpath = sel.xpath('..//a[@class="posterName"]//text()')
+            if len(author_xpath):
+                item['author'] = author_xpath[0].extract()
+            else:
+                # Guest account most likely, no link to profile page
+                author_xpath = sel.xpath('..//td[@class="posterInfoHead"]//text()')
+                if not len(author_xpath):
+                    scrapy.log.error("Missing post author name!")
+                    continue
+                item['author'] = author_xpath[0].extract().strip() + " (Guest)"
+
             item['date'] = sel.xpath('..//div[@class="postDate"]/text()')[1].extract().strip()
             item['post_id'] = post_sel.xpath('@id').re('td_post_([0-9]+)')[0]
 
