@@ -4,21 +4,12 @@ import re
 from scrapy.selector import Selector
 import json
 
-with open('xda_threads.json') as f:
-    threads = json.load(f)
-with open('xda_rank_posts.json') as f:
-    posts = json.load(f)
-
-thread_lookup = {}
-for thread in threads:
-    thread_lookup[thread['thread_id']] = thread
-
 def convert_date(datestr):
-    """Convert XDA's timestamp to ISO-8601-based representation. Expected input should match one
-       of the following examples:
-        4th November 2013, 03:07 PM
-        Yesterday, 12:37 PM
-        Today, 01:43 AM
+    """Convert XDA's timestamp to ISO-8601-based representation, e.g. "2013-11-04T23:07:00Z".
+       Input should match one of the following formats:
+         4th November 2013, 03:07 PM
+         Yesterday, 12:37 PM
+         Today, 01:43 AM
     """
     m = re.search('(Today|Yesterday), ([0-9]{2}):([0-9]{2}) (AM|PM)', datestr)
     if m:
@@ -34,7 +25,6 @@ def convert_date(datestr):
             date.replace(days=-1)
     else:
         date = arrow.get(datestr, 'D MMMM YYYY, HH:mm A').replace(tzinfo=tz.gettz('US/Pacific'))
-    # Return in form like '2013-11-04T23:07:00Z'
     return date.to('UTC').isoformat()[:-6] + 'Z'
 
 def strip_html(content):
@@ -49,20 +39,34 @@ def strip_quotes(content):
         content = content.replace(quote.extract(), '', 1)
     return content
 
-def add_thread_info(post):
+def add_thread_info(post, thread_lookup):
     thread = thread_lookup[post['thread_id']]
     post['thread_title'] = thread['title']
     post['thread_view_count'] = thread['view_count']
     post['url'] = 'http://forum.xda-developers.com%s/post%s' % (thread['link'], post['post_id'])
 
-for post in posts:
-    post['content_no_quotes'] = strip_html(strip_quotes(post['content']))
-    post['content'] = strip_html(post['content'])
-    add_thread_info(post)
-    post['date'] = convert_date(post['date'])
-    post['thanks_count'] = len(post['thanks'])
-    post['thread_view_count'] = int(post['thread_view_count'])
-    if 'used' in post:
-        post.pop('used', None)
+def build_thread_lookup(threads):
+    """Construct a dictionary mapping thread ID to decoded thread JSON object"""
+    thread_lookup = {}
+    for thread in threads:
+        thread_lookup[thread['thread_id']] = thread
+    return thread_lookup
 
-json.dump(posts, open('xda_index_posts.json', 'w'), indent=2)
+if __name__ == "__main__":
+    with open('xda_threads.json') as f:
+        threads = json.load(f)
+    with open('xda_rank_posts.json') as f:
+        posts = json.load(f)
+
+    thread_lookup = build_thread_lookup(threads)
+    for post in posts:
+        post['content_no_quotes'] = strip_html(strip_quotes(post['content']))
+        post['content'] = strip_html(post['content'])
+        add_thread_info(post, thread_lookup)
+        post['date'] = convert_date(post['date'])
+        post['thanks_count'] = len(post['thanks'])
+        post['thread_view_count'] = int(post['thread_view_count'])
+        if 'used' in post:
+            post.pop('used', None)
+
+    json.dump(posts, open('xda_index_posts.json', 'w'), indent=2)
