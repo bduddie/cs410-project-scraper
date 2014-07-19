@@ -58,7 +58,7 @@ class XdaSpider(scrapy.Spider):
             item = ThreadItem()
             item['title'] = sel.xpath('text()')[0].extract()
             item['link'] = sel.xpath('@href')[0].extract().strip()
-            item['thread_id'] = re.search('.\-t([0-9]+)', item['link']).group(1)
+            item['thread_id'] = re.match('thread_title_([0-9]+)', sel.xpath('@id').extract()[0]).group(1)
             item['forum'] = forum
             item['sub_forum'] = sub_forum
             item['view_count'] = sel.xpath('../../../td[@class="statsColumn"]/div/text()').re('Views: ([0-9,]+)')[0]
