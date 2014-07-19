@@ -1,3 +1,5 @@
+import arrow
+from dateutil import tz
 import scrapy
 import re
 from urlparse import urljoin
@@ -17,6 +19,31 @@ class XdaSpider(scrapy.Spider):
     ]
 
     THREAD_PAGE_LIMIT = 10
+
+    def convert_date(self, datestr):
+        """Convert XDA's timestamp to ISO-8601-based representation. Expected input should match one
+           of the following examples:
+            4th November 2013, 03:07 PM
+            Yesterday, 12:37 PM
+            Today, 01:43 AM
+        """
+        m = re.search('(Today|Yesterday), ([0-9]{2}):([0-9]{2}) (AM|PM)', datestr)
+        if m:
+            day = m.group(1)
+            hour = int(m.group(2))
+            minute = int(m.group(3))
+            if m.group(4) == 'PM' and hour < 12:
+                hour += 12
+            elif m.group(4) == 'AM' and hour == 12:
+                hour = 0
+            date = arrow.get(tz.gettz('US/Pacific')).replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if day == 'Yesterday':
+                date.replace(days=-1)
+        else:
+            date = arrow.get(datestr, 'D MMMM YYYY, HH:mm A').replace(tzinfo=tz.gettz('US/Pacific'))
+        # Return in form like '2013-11-04T23:07:00Z'
+        return date.to('UTC').isoformat()[:-6] + 'Z'
+
 
     def parse(self, response):
         split_url = response.url.split('/')
@@ -75,6 +102,7 @@ class XdaSpider(scrapy.Spider):
                 item['author'] = author_xpath[0].extract().strip() + " (Guest)"
 
             item['date'] = sel.xpath('..//div[@class="postDate"]/text()')[1].extract().strip()
+            item['date'] = self.convert_date(item['date'])
             item['post_id'] = post_sel.xpath('@id').re('td_post_([0-9]+)')[0]
 
             post_message = post_sel.xpath('div[@id="post_message_' + item['post_id'] + '"]')
