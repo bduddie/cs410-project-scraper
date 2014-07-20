@@ -42,7 +42,7 @@ def strip_quotes(content):
 def add_thread_info(post, thread_lookup):
     thread = thread_lookup[post['thread_id']]
     post['thread_title'] = thread['title']
-    post['thread_view_count'] = thread['view_count']
+    post['thread_view_count'] = int(thread['view_count'])
     post['url'] = 'http://forum.xda-developers.com%s/post%s' % (thread['link'], post['post_id'])
 
 def build_thread_lookup(threads):
@@ -52,6 +52,17 @@ def build_thread_lookup(threads):
         thread_lookup[thread['thread_id']] = thread
     return thread_lookup
 
+def index_preprocess(posts, thread_lookup):
+    for post in posts:
+        post['content_no_quotes'] = strip_quotes(post['content'])
+        post['content_no_quotes_no_html'] = strip_html(post['content_no_quotes'])
+        post['content_no_html'] = strip_html(post['content'])
+        add_thread_info(post, thread_lookup)
+        post['date'] = convert_date(post['date'])
+        post['thanks_count'] = len(post['thanks'])
+        if 'used' in post:
+            post.pop('used', None)
+
 if __name__ == "__main__":
     with open('xda_threads.json') as f:
         threads = json.load(f)
@@ -59,14 +70,6 @@ if __name__ == "__main__":
         posts = json.load(f)
 
     thread_lookup = build_thread_lookup(threads)
-    for post in posts:
-        post['content_no_quotes'] = strip_html(strip_quotes(post['content']))
-        post['content'] = strip_html(post['content'])
-        add_thread_info(post, thread_lookup)
-        post['date'] = convert_date(post['date'])
-        post['thanks_count'] = len(post['thanks'])
-        post['thread_view_count'] = int(post['thread_view_count'])
-        if 'used' in post:
-            post.pop('used', None)
+    index_preprocess(posts, thread_lookup)
 
     json.dump(posts, open('xda_index_posts.json', 'w'), indent=2)
