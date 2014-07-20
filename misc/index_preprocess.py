@@ -1,31 +1,5 @@
-import arrow
-from dateutil import tz
-import re
 from scrapy.selector import Selector
 import json
-
-def convert_date(datestr):
-    """Convert XDA's timestamp to ISO-8601-based representation, e.g. "2013-11-04T23:07:00Z".
-       Input should match one of the following formats:
-         4th November 2013, 03:07 PM
-         Yesterday, 12:37 PM
-         Today, 01:43 AM
-    """
-    m = re.search('(Today|Yesterday), ([0-9]{2}):([0-9]{2}) (AM|PM)', datestr)
-    if m:
-        day = m.group(1)
-        hour = int(m.group(2))
-        minute = int(m.group(3))
-        if m.group(4) == 'PM' and hour < 12:
-            hour += 12
-        elif m.group(4) == 'AM' and hour == 12:
-            hour = 0
-        date = arrow.get(tz.gettz('US/Pacific')).replace(hour=hour, minute=minute, second=0, microsecond=0)
-        if day == 'Yesterday':
-            date.replace(days=-1)
-    else:
-        date = arrow.get(datestr, 'D MMMM YYYY, HH:mm A').replace(tzinfo=tz.gettz('US/Pacific'))
-    return date.to('UTC').isoformat()[:-6] + 'Z'
 
 def strip_html(content):
     stripped = ''
@@ -58,7 +32,6 @@ def index_preprocess(posts, thread_lookup):
         post['content_no_quotes_no_html'] = strip_html(post['content_no_quotes'])
         post['content_no_html'] = strip_html(post['content'])
         add_thread_info(post, thread_lookup)
-        post['date'] = convert_date(post['date'])
         post['thanks_count'] = len(post['thanks'])
         if 'used' in post:
             post.pop('used', None)

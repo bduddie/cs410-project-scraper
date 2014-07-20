@@ -75,9 +75,8 @@ def compute_thread_positions(rank_posts, thread_lookup):
         else:
             post['author_is_op'] = 0
 
-        # TODO: won't need to convert_date() on these with the updated dataset
-        post['thread_start'] = convert_date(op['date'])
-        post['thread_end'] = convert_date(thread['posts'][-1]['date'])
+        post['thread_start'] = op['date']
+        post['thread_end'] = thread['posts'][-1]['date']
         post['thread_duration_minutes'] = duration_minutes(post['thread_start'], post['thread_end'])
 
     # note: was thinking about calculating how many times a post is quoted, but decided
