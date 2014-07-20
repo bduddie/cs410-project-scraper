@@ -16,7 +16,7 @@ compute_features(top_posts, thread_lookup, posts)
 
 top_posts_minus_op = []
 for post in top_posts:
-    if post['thread_position'] != 0 and (post['thread_position'] != 1 or not post['author_is_op']):
+    if post['thread_position'] != 0 and (post['thread_position'] > 2 or not post['author_is_op']):
         top_posts_minus_op.append(post)
         if len(top_posts_minus_op) == 100:
             break
