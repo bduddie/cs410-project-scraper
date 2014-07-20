@@ -37,9 +37,10 @@ def duration_minutes(start, end):
     delta = end - start
     return int(delta.total_seconds() / 60)
 
-def compute_thread_positions(rank_posts, thread_lookup):
-    with open('xda_posts.json') as f:
-        all_posts = json.load(f)
+def compute_thread_positions(rank_posts, thread_lookup, all_posts=None):
+    if not all_posts:
+        with open('xda_posts.json') as f:
+            all_posts = json.load(f)
 
     post_lookup = {}
     for post in rank_posts:
@@ -84,14 +85,7 @@ def compute_thread_positions(rank_posts, thread_lookup):
     #for rank_thread in rank_threads:
         #for post in rank_thread:
 
-if __name__ == "__main__":
-    with open('xda_threads.json') as f:
-        threads = json.load(f)
-    with open('xda_rank_posts.json') as f:
-        posts = json.load(f)
-
-    thread_lookup = build_thread_lookup(threads)
-    index_preprocess(posts, thread_lookup)
+def compute_features(posts, thread_lookup, all_posts=None):
     for post in posts:
         (post['term_count'], post['term_count_unique']) = term_counts(post['content_no_html'])
         (post['term_count_no_quotes'], post['term_count_no_quotes_unique']) = term_counts(post['content_no_quotes_no_html'])
@@ -102,5 +96,15 @@ if __name__ == "__main__":
         post['is_html'] = is_html_formatted(sel_no_quotes)
         post['contains_list'] = contains_list_html(sel_no_quotes)
 
-    compute_thread_positions(posts, thread_lookup)
+    compute_thread_positions(posts, thread_lookup, all_posts)
+
+if __name__ == "__main__":
+    with open('xda_threads.json') as f:
+        threads = json.load(f)
+    with open('xda_rank_posts.json') as f:
+        posts = json.load(f)
+
+    thread_lookup = build_thread_lookup(threads)
+    index_preprocess(posts, thread_lookup)
+    compute_features(posts, thread_lookup)
     json.dump(posts, open('xda_rank_posts_features.json', 'w'), indent=2)
