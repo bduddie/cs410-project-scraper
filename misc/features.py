@@ -72,9 +72,9 @@ def compute_thread_positions(rank_posts, thread_lookup, all_posts=None):
         post['thread_post_count'] = len(thread['posts'])
         op = thread['posts'][0]
         if post['author'] == op['author']:
-            post['author_is_op'] = 1
+            post['author_is_op'] = True
         else:
-            post['author_is_op'] = 0
+            post['author_is_op'] = False
 
         post['thread_start'] = op['date']
         post['thread_end'] = thread['posts'][-1]['date']
