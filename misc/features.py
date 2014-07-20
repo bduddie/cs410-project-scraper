@@ -62,6 +62,7 @@ def compute_thread_positions(rank_posts, thread_lookup, all_posts=None):
     for post in rank_posts:
         thread = rank_threads[post['thread_id']]
         index = 0
+        thread['posts'] = sorted(thread['posts'], key=lambda k: int(k['post_id']))
         for thread_post in thread['posts']:
             if thread_post['post_id'] == post['post_id']:
                 post['thread_position'] = index
