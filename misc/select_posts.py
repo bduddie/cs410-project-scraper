@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 import random
 
 with open('xda_posts.json', 'r') as f:

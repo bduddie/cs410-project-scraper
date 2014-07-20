@@ -1,6 +1,6 @@
 from datetime import datetime
 from index_preprocess import *
-import json
+import simplejson as json
 from scrapy.selector import Selector
 
 def count_unique_terms(terms):

@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 
 with open('xda_all.json') as f:
     items = json.load(f)

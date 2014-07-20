@@ -1,5 +1,5 @@
 from scrapy.selector import Selector
-import json
+import simplejson as json
 
 def strip_html(content):
     stripped = ''
@@ -26,11 +26,16 @@ def build_thread_lookup(threads):
         thread_lookup[thread['thread_id']] = thread
     return thread_lookup
 
-def index_preprocess(posts, thread_lookup):
+def index_preprocess(posts, thread_lookup, no_html=False):
     for post in posts:
         post['content_no_quotes'] = strip_quotes(post['content'])
         post['content_no_quotes_no_html'] = strip_html(post['content_no_quotes'])
         post['content_no_html'] = strip_html(post['content'])
+        if no_html:
+            post['content'] = post['content_no_html']
+            post['content_no_quotes'] = post['content_no_quotes_no_html']
+            post.pop('content_no_html')
+            post.pop('content_no_quotes_no_html')
         add_thread_info(post, thread_lookup)
         post['thanks_count'] = len(post['thanks'])
         if 'used' in post:
@@ -43,6 +48,6 @@ if __name__ == "__main__":
         posts = json.load(f)
 
     thread_lookup = build_thread_lookup(threads)
-    index_preprocess(posts, thread_lookup)
+    index_preprocess(posts, thread_lookup, True)
 
     json.dump(posts, open('xda_index_posts.json', 'w'), indent=2)
