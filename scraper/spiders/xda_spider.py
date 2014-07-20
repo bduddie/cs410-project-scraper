@@ -11,11 +11,11 @@ class XdaSpider(scrapy.Spider):
     #allowed_domains = "forum.xda-developers.com"
     start_urls = [
         "http://forum.xda-developers.com/google-nexus-5/general",
-        "http://forum.xda-developers.com/google-nexus-5/help",
-        "http://forum.xda-developers.com/google-nexus-5/accessories",
-        "http://forum.xda-developers.com/google-nexus-5/development",
-        "http://forum.xda-developers.com/google-nexus-5/orig-development",
-        "http://forum.xda-developers.com/google-nexus-5/themes-apps"
+        #"http://forum.xda-developers.com/google-nexus-5/help",
+        #"http://forum.xda-developers.com/google-nexus-5/accessories",
+        #"http://forum.xda-developers.com/google-nexus-5/development",
+        #"http://forum.xda-developers.com/google-nexus-5/orig-development",
+        #"http://forum.xda-developers.com/google-nexus-5/themes-apps"
     ]
 
     THREAD_PAGE_LIMIT = 10
