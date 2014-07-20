@@ -3,10 +3,12 @@ import webbrowser
 
 print("""
 Please follow these guidelines when ranking posts:
-  Low - does not add to the discussion (spam, off-topic, no real content, etc.)
-  Medium - moves the discussion forward but is not otherwise helpful (e.g. asks a relevant question)
-  High - important post in the thread; contributes useful information that a reader browsing through the thread should see
-
+  1 - adds nothing to discussion (off-topic, spam, "lolwut", etc.)
+  2 - necessary in conversation but not otherwise worthwhile ("It worked", etc.)
+  3 - asks a relevant question or provides a typical answer ("I tried doing this
+      but it doesn't work", "Try this, it worked for me", etc.)
+  4 - provides an authoritative answer or useful original content
+  5 - very important or useful post (FAQ, etc.)
 """)
 
 with open('xda_threads.json') as f:
@@ -19,8 +21,15 @@ for thread in threads:
     thread_lookup[thread['thread_id']] = thread
 
 quit = False
+index = 0
 for post in posts:
+    index += 1
     if 'quality' in post:
+        continue
+
+    if not post['content_no_quotes_no_html']:
+        print("Removing post since no original, non-HTML content")
+        posts.remove(post)
         continue
 
     thread = thread_lookup[post['thread_id']]
@@ -29,26 +38,27 @@ for post in posts:
     webbrowser.open(url)
 
     while 42:
-        print("Please provide a quality ranking for post %s (by %s)" % (post['post_id'], post['author']))
-        value = input("(0,1,2|L,M,H), or Q to quit: [M] ")
+        print("Please provide a quality ranking for post %s (by %s) [%d / %d]" %
+              (post['post_id'], post['author'], index, len(posts)))
+        value = input("(1-5), or Q to quit: [3] ")
+
         if not value:
-            value = "M"
-        elif value == "0":
-            value = "L"
-        elif value == "1":
-            value = "M"
-        elif value == "2":
-            value = "H"
+            value = "3"
 
         value = value.upper()
         if value == "Q":
             quit = True
             break
-        elif value != "L" and value != "M" and value != "H":
-            print("Unrecognized input '" + value + "' - please enter L, M, or H (case insensitive)")
         else:
-            post['quality'] = value
-            break
+            try:
+                value = int(value)
+                if 1 <= value <= 5:
+                    post['quality'] = value
+                    break
+                else:
+                    print("Out of expected range, try again")
+            except ValueError:
+                print("Not a valid number or 'Q', try again")
     if quit:
         break
 
