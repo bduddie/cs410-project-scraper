@@ -6,7 +6,7 @@ with open('xda_posts.json') as f:
     posts = json.load(f)
 
 posts = sorted(posts, key=lambda k: len(k['thanks']), reverse=True)
-top_posts = posts[0:1000]
+top_posts = posts[0:250]
 
 with open('xda_threads.json') as f:
     thread_lookup = build_thread_lookup(json.load(f))
@@ -18,6 +18,8 @@ top_posts_minus_op = []
 for post in top_posts:
     if post['thread_position'] != 0 and (post['thread_position'] != 1 or not post['author_is_op']):
         top_posts_minus_op.append(post)
+        if len(top_posts_minus_op) == 100:
+            break
 
 with open('xda_posts_top_100_thanked.json', 'w') as f:
     json.dump(top_posts_minus_op, f, indent=2)
