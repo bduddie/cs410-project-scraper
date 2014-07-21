@@ -1,5 +1,6 @@
 from datetime import datetime
 from index_preprocess import *
+import re
 import simplejson as json
 from scrapy.selector import Selector
 
@@ -28,8 +29,12 @@ def is_html_formatted(sel):
     else:
         return False
 
-def contains_list_html(sel):
-    return True if sel.xpath('//div')[0].xpath('.//ol | .//ul | .//li') else False
+def contains_list(post, sel):
+    if (sel.xpath('//div')[0].xpath('.//ol | .//ul | .//li') or
+                len(re.findall('\n\s*[\*\-]\s*[\w\-\.,:;\(\)]+', post['content_no_quotes_no_html'])) > 1):
+        return True
+    else:
+        return False
 
 def duration_minutes(start, end):
     start = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
@@ -95,7 +100,7 @@ def compute_features(posts, thread_lookup, all_posts=None):
         sel_no_quotes = Selector(text=post['content_no_quotes'])
         post['hyperlink_count'] = hyperlink_count(sel_no_quotes)
         post['is_html'] = is_html_formatted(sel_no_quotes)
-        post['contains_list'] = contains_list_html(sel_no_quotes)
+        post['contains_list'] = contains_list(post, sel_no_quotes)
 
     compute_thread_positions(posts, thread_lookup, all_posts)
 
