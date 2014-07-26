@@ -31,12 +31,16 @@ def bool_to_int(posts, keys):
                 post[key] = 0
 
 if __name__ == "__main__":
-    with open('xda_rank_posts.json') as f:
+    with open('xda_posts_features.json') as f:
         posts = json.load(f)
 
     for post in posts:
-        post['thread_views_per_minute'] = post['thread_view_count'] / post['thread_duration_minutes']
-        post['thread_position'] = post['thread_position'] / post['thread_post_count']
+        if post['thread_duration_minutes'] == 0:
+            post['thread_duration_minutes'] = 1
+        post['thread_views_per_minute'] = float(post['thread_view_count']) / post['thread_duration_minutes']
+        post['thread_position'] = float(post['thread_position']) / post['thread_post_count']
+        if 'quality' not in post:
+            post['quality'] = 0
 
     normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
                       'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
