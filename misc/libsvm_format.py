@@ -1,6 +1,26 @@
+import math
 import simplejson as json
 import sys
 
+def log_normalize(posts, keys):
+    '''Performs logarithmic min-max normalization of numerical features to [-1,1]'''
+    min = {}
+    max = {}
+    for key in keys:
+        min[key] = sys.maxsize
+        max[key] = -sys.maxsize - 1
+
+    for post in posts:
+        for key in keys:
+            if post[key] < min[key]:
+                min[key] = post[key]
+            if post[key] > max[key]:
+                max[key] = post[key]
+
+    for post in posts:
+        for key in keys:
+            ratio = (float(post[key]) - min[key]) / (max[key] - min[key])
+            post[key] = math.log(1 + 3*ratio, 2) - 1
 
 def normalize(posts, keys):
     '''Performs min-max normalization of numerical features to [0,1]'''
@@ -44,9 +64,13 @@ if __name__ == "__main__":
 
     bool_to_int(posts, ['contains_list', 'author_is_op', 'is_html'])
 
-    if False: # normalized
-        normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
-                      'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
+    if True: # normalized
+        if True: # linear normalization
+            normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
+                              'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
+        else: # log normalization
+            log_normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
+                                  'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
         for post in posts:
             print('%d 1:%d 2:%d 3:%d 4:%f 5:%f 6:%f 7:%f 8:%f 9:%f 10:%f 11:%f 12:%f' %
                   (post['quality'], post['contains_list'], post['author_is_op'], post['is_html'],
