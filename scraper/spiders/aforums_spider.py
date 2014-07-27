@@ -42,13 +42,8 @@ class AForumsSpider(scrapy.Spider):
 
     def parse(self, response):
         split_url = response.url.split('/')
-        if split_url[-1].startswith('index'):
-            offset = -1
-        else:
-            offset = 0
-
-        forum = split_url[offset - 2]
-        sub_forum = split_url[offset - 1]
+        forum = split_url[1]
+        sub_forum = split_url[split_url.find('=')+1]
         for sel in response.xpath('//a[@id="thread_title_*"]'):
             item = ThreadItem()
             item['title'] = sel.xpath('text()')[0].extract()
