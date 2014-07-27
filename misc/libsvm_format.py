@@ -42,13 +42,21 @@ if __name__ == "__main__":
         if 'quality' not in post:
             post['quality'] = 0
 
-    normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
-                      'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
     bool_to_int(posts, ['contains_list', 'author_is_op', 'is_html'])
 
-    for post in posts:
-        print('%d 1:%d 2:%d 3:%d 4:%f 5:%f 6:%f 7:%f 8:%f 9:%f 10:%f 11:%f 12:%f' %
-              (post['quality'], post['contains_list'], post['author_is_op'], post['is_html'],
-               post['term_count'], post['term_count_unique'], post['term_count_no_quotes'],
-               post['term_count_no_quotes_unique'], post['thanks_count'], post['hyperlink_count'],
-               post['quotes_count'], post['thread_position'], post['thread_views_per_minute']))
+    if False: # normalized
+        normalize(posts, ['term_count', 'term_count_unique', 'term_count_no_quotes', 'term_count_no_quotes_unique',
+                      'thanks_count', 'hyperlink_count', 'quotes_count', 'thread_views_per_minute'])
+        for post in posts:
+            print('%d 1:%d 2:%d 3:%d 4:%f 5:%f 6:%f 7:%f 8:%f 9:%f 10:%f 11:%f 12:%f' %
+                  (post['quality'], post['contains_list'], post['author_is_op'], post['is_html'],
+                   post['term_count'], post['term_count_unique'], post['term_count_no_quotes'],
+                   post['term_count_no_quotes_unique'], post['thanks_count'], post['hyperlink_count'],
+                   post['quotes_count'], post['thread_position'], post['thread_views_per_minute']))
+    else: # not normalized
+        for post in posts:
+            print('%d 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d 9:%d 10:%d 11:%f 12:%f' %
+                  (post['quality'], post['contains_list'], post['author_is_op'], post['is_html'],
+                   post['term_count'], post['term_count_unique'], post['term_count_no_quotes'],
+                   post['term_count_no_quotes_unique'], post['thanks_count'], post['hyperlink_count'],
+                   post['quotes_count'], post['thread_position'], post['thread_views_per_minute']))
